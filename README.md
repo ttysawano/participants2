@@ -1,18 +1,18 @@
 # participants2 (DokuWiki plugin)
 
-A re-skin of your `participants` plugin that renders a **frame-style,
-div-based list** instead of a table:
+`participants2` is a DokuWiki plugin that lets you place a simple attendance list on a page.
+People can click their own name to mark **present/absent** and leave a short comment.
+An **Export** button can copy the names for sharing.
 
-- Each participant is a small pill inside a flexible row/column layout.
-- No individual edit buttons; **click a name** to edit status or leave a one-line comment.
-- **Hover** a name to show a small tooltip indicating status (present/absent).
-- A **comment section** at the bottom lists only the names with non-empty comments.
-- **Export…** button to copy present/absent names in a chosen format.
+## What it does
 
-Data storage and ACL checks are equivalent to the original plugin, but kept separate:
-this plugin stores data in `data/meta/<page>.participants2.json`.
+- Renders a frame-style list of names (no tables)
+- Click a name to change attendance and add a one-line comment
+- Hover shows the current status (present/absent)
+- A comment section lists only the names that have comments
+- Export present/absent names with selectable format
 
-## Markup
+## How to use (markup)
 
 ```
 <participants2>
@@ -22,10 +22,16 @@ this plugin stores data in `data/meta/<page>.participants2.json`.
 </participants2>
 ```
 
+## Install
+
+1. Place this directory under `lib/plugins/participants2/`.
+2. Clear the DokuWiki cache (or open a page with `?purge=true`).
+3. Use `<participants2>...</participants2>` in a page.
+
 ## Localization
 
 Strings are provided in `lang/ja/lang.php` and `lang/en/lang.php`.
-You can override:
+You can customize:
 - frame title
 - click hint
 - comment heading
@@ -33,22 +39,8 @@ You can override:
 - dialog strings
 - export UI strings
 
-## Export
-
-The Export button opens a modal where you can:
-- select present and/or absent
-- choose full name or first token (split by half/full-width spaces)
-- choose delimiter: space, comma, or newline
-
-The output is shown in a textarea and copied to the clipboard.
-
-## Install
-
-1. Put this directory under `lib/plugins/participants2/`.
-2. Clear the DokuWiki cache or add `?purge=true` once.
-3. Use `<participants2>..</participants2>` in a page.
-
 ## Notes
 
-- The page cache is invalidated when `data/meta/<page>.participants2.json` is modified.
-- Concurrency behaves the same as DokuWiki metadata-based storage (last save wins).
+- Data is stored in `data/meta/<page>.participants2.json`.
+- The page cache is invalidated when that JSON file is modified.
+- Concurrency is the same as DokuWiki metadata-based storage (last save wins).
