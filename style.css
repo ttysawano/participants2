@@ -128,3 +128,10 @@
 /* Export toast */
 .pp2-toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: #111; color: #fff; padding: 6px 10px; border-radius: 6px; opacity: 0; transition: opacity .15s ease; z-index: 10000; font-size: 12px; }
 .pp2-toast.on { opacity: .95; }
+
+@media print {
+  .participants2-export { display: none !important; }
+  .pp2-export-overlay,
+  .pp2-interval-overlay,
+  .pp2-toast { display: none !important; }
+}
