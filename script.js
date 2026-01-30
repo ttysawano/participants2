@@ -212,7 +212,7 @@
       space: dict.export_space || 'Space',
       comma: dict.export_comma || 'Comma',
       newline: dict.export_newline || 'Newline',
-      run: dict.export_run || 'Export & Copy',
+      run: dict.export_run || 'Copy',
       output: dict.export_output || 'Output',
       copied: dict.export_copied || 'Copied!'
     };
@@ -276,9 +276,21 @@
       return formatList(names, delim);
     }
 
+    function updateOutput(){
+      ov.querySelector('.pp2-ex-out').value = buildOutput();
+    }
+
+    updateOutput();
+
+    ov.addEventListener('change', function(e){
+      if(e.target && e.target.matches('input[type="checkbox"], input[type="radio"]')){
+        updateOutput();
+      }
+    });
+
     ov.querySelector('.pp2-ex-run').addEventListener('click', function(){
-      var out = buildOutput();
-      ov.querySelector('.pp2-ex-out').value = out;
+      updateOutput();
+      var out = ov.querySelector('.pp2-ex-out').value;
       copyToClipboard(out, L.copied);
     });
   }
