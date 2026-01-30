@@ -7,6 +7,7 @@ div-based list** instead of a table:
 - No individual edit buttons; **click a name** to edit status or leave a one-line comment.
 - **Hover** a name to show a small tooltip indicating status (present/absent).
 - A **comment section** at the bottom lists only the names with non-empty comments.
+- **Export…** button to copy present/absent names in a chosen format.
 
 Data storage and ACL checks are equivalent to the original plugin, but kept separate:
 this plugin stores data in `data/meta/<page>.participants2.json`.
@@ -30,6 +31,16 @@ You can override:
 - comment heading
 - present/absent labels
 - dialog strings
+- export UI strings
+
+## Export
+
+The Export button opens a modal where you can:
+- select present and/or absent
+- choose full name or first token (split by half/full-width spaces)
+- choose delimiter: space, comma, or newline
+
+The output is shown in a textarea and copied to the clipboard.
 
 ## Install
 
