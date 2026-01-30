@@ -14,6 +14,12 @@
     if(root && root.__pp2_i18n) return root.__pp2_i18n;
     try {
       var node = root && root.querySelector('script[type="application/x-participants2-i18n"]');
+      if(!node && root){
+        var pid = root.getAttribute('data-pageid') || '';
+        if(pid){
+          node = document.querySelector('script[type="application/x-participants2-i18n"][data-pp2-i18n="1"][data-pageid="'+pid+'"]');
+        }
+      }
       if(!node) return {};
       var dict = JSON.parse(node.textContent);
       if(root) root.__pp2_i18n = dict;

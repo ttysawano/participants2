@@ -130,7 +130,11 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
             'update_60' => $this->getLang('update_60'),
             'update_now' => $this->getLang('update_now'),
         );
-        $R->doc .= '<script type="application/x-participants2-i18n">'.hsc(json_encode($i18n, JSON_UNESCAPED_UNICODE)).'</script>';
+        $i18nJson = json_encode(
+            $i18n,
+            JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+        $R->doc .= '<script type="application/x-participants2-i18n" data-pp2-i18n="1" data-pageid="'.hsc($ID).'">'.$i18nJson.'</script>';
         $R->doc .= '<script src="'.DOKU_BASE.'lib/plugins/participants2/script.js"></script>';
         $R->doc .= '<link rel="stylesheet" href="'.DOKU_BASE.'lib/plugins/participants2/style.css?v=20250828" />';
 
