@@ -11,7 +11,14 @@
   function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function getI18N(root){
-    try { return JSON.parse(root.querySelector('script[type="application/x-participants2-i18n"]').textContent); }
+    if(root && root.__pp2_i18n) return root.__pp2_i18n;
+    try {
+      var node = root && root.querySelector('script[type="application/x-participants2-i18n"]');
+      if(!node) return {};
+      var dict = JSON.parse(node.textContent);
+      if(root) root.__pp2_i18n = dict;
+      return dict;
+    }
     catch(e){ return {}; }
   }
 
