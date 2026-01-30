@@ -16,8 +16,8 @@ An **Export** button can copy the names for sharing.
 
 ```
 <participants2>
-  <person>田中 太郎</person>
-  <person>佐藤 花子</person>
+  <person>John Smith</person>
+  <person>Jane Doe</person>
   ...
 </participants2>
 ```

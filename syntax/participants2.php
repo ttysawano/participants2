@@ -30,7 +30,7 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
         if($mode !== 'xhtml') return false;
         global $ID;
 
-        // ★ sectok の陳腐化を避ける（ページに古いトークンが焼き付かないように）
+        // Avoid stale sectok being baked into cached HTML
         $R->nocache();
         $R->info['cache'] = false;
 
