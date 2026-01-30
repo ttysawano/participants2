@@ -1,0 +1,7 @@
+base participants2
+author Tatsuya Sawano
+email ttysawano@sylphymail.com
+date 2025-08-28
+name participants2
+desc Frame-style participants list with click-to-edit & hover status (present/absent + description)
+url https://github.com/ttysawano/participants2/

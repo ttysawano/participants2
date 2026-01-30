@@ -1,0 +1,98 @@
+/* SPDX-License-Identifier: MIT */
+/* (c) 2026 Tatsuya Sawano */
+
+/* Container */
+.participants2-container {
+  font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  padding: 8px 0;
+}
+
+/* Frame */
+.participants2-frame {
+  position: relative;
+  border: 1px solid #ccc;
+  padding: 16px 12px;
+  border-radius: 8px;
+  background-color: transparent;
+}
+
+/* Title chip */
+.participants2-title {
+  position: absolute;
+  top: -12px;
+  left: 12px;
+  background-color: #fff;
+  padding: 0 8px;
+  font-size: 1.1em;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Hint */
+.participants2-hint {
+  text-align: left;
+  margin-bottom: 10px;
+  font-size: 0.8em;
+  color: #888;
+}
+
+/* List */
+.participants2-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-start;
+}
+
+/* Name pill */
+.pp2-name {
+  padding: 3px 6px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 0.95em;
+  position: relative;
+  cursor: pointer;
+}
+
+/* Colors by status */
+.pp2-name.is-present { color: #000; background-color: #fff; }
+.pp2-name.is-absent  { color: #cc0000; background-color: #e0e0e0; }
+
+/* Tooltip */
+.pp2-name::after {
+  content: attr(data-title);
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  background-color: #333;
+  color: #fff;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 0.8em;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .2s;
+  z-index: 10;
+}
+.pp2-name:hover::after { opacity: 1; visibility: visible; }
+
+/* Comment section */
+.participants2-comments {
+  margin-top: 14px;
+  font-size: 0.85em;
+  color: #666;
+  line-height: 1.35;
+}
+.participants2-comments p { margin: 0; padding: 0; }
+
+/* Simple modal (reused from original) */
+.participants2-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: none; align-items: center; justify-content: center; z-index: 9999; }
+.participants2-dialog  { background: #fff; padding: 16px; border-radius: 8px; width: 420px; max-width: 90vw; box-shadow: 0 4px 24px rgba(0,0,0,.2); }
+.participants2-dialog .dlg-title { font-weight: bold; margin-bottom: 8px; }
+.participants2-dialog label { display: block; margin: 8px 0; }
+.participants2-dialog .row { margin-bottom: 8px; }
+.participants2-dialog .actions { text-align: right; margin-top: 12px; }
+.participants2-dialog .actions button { margin-left: 6px; }
