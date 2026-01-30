@@ -11,7 +11,7 @@ class action_plugin_participants2_ajax extends DokuWiki_Action_Plugin {
     }
 
     public function handle(Doku_Event $event, $param){
-        // 互換のため：旧 call=plugin_participants2_save も受け入れる
+        // Compatibility: also accept legacy call=plugin_participants2_save
         if($event->data !== 'participants2' && $event->data !== 'plugin_participants2_save') return;
 
         $event->preventDefault();
@@ -19,22 +19,22 @@ class action_plugin_participants2_ajax extends DokuWiki_Action_Plugin {
 
         global $INPUT;
 
-        // コマンド判定（互換：旧実装は cmd なし→ save として扱う）
+        // Command selection (legacy: no cmd means save)
         $cmd = $INPUT->str('cmd') ?: 'save';
 
-        // ---- token: 最新CSRFトークンを返す（ここは checkSecurityToken しない）
+        // ---- token: return latest CSRF token (no checkSecurityToken here)
         if ($cmd === 'token') {
             $this->respond(200, ['ok'=>true, 'sectok'=>getSecurityToken()]);
             return;
         }
 
-        // パラメータ
+        // Parameters
         $page = cleanID($INPUT->str('page'));
         $name = trim($INPUT->str('name'));
         $status = $INPUT->str('status'); // 'present' | 'absent'
         $desc = $INPUT->str('description');
 
-        // ---- load（参照系：トークン不要）
+        // ---- load (read-only: no token required)
         if ($cmd === 'load') {
             if(!$page){ $this->respond(400, ['ok'=>false,'error'=>'bad_param']); return; }
             if(auth_quickaclcheck($page) < AUTH_READ){ $this->respond(403, ['ok'=>false,'error'=>'no_acl']); return; }
@@ -48,7 +48,7 @@ class action_plugin_participants2_ajax extends DokuWiki_Action_Plugin {
             return;
         }
 
-        // ---- save（書き込み系：ここでのみトークン検査）
+        // ---- save (write: token check only here)
         if ($cmd === 'save') {
             if(!checkSecurityToken()){
                 $this->respond(403, ['ok'=>false,'error'=>'bad_token']);
@@ -87,7 +87,7 @@ class action_plugin_participants2_ajax extends DokuWiki_Action_Plugin {
             return;
         }
 
-        // 未知のコマンド
+        // Unknown command
         $this->respond(400, ['ok'=>false,'error'=>'bad_cmd']);
     }
 

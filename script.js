@@ -106,7 +106,7 @@
     });
   }
 
-  // ここを「token取得＋retry」対応に置き換え
+  // Replace with "token fetch + retry" flow
   function saveChange(root, pill, payload){
     var page = root.getAttribute('data-pageid');
 
@@ -297,7 +297,7 @@
 
   function init(){
     $all('.participants2-root').forEach(function(root){
-      // 旧HTMLに埋め込まれた data-sectok はもう使わない（陳腐化対策）
+      // Do not use data-sectok embedded in old HTML (avoid stale token)
       root.removeAttribute('data-sectok');
 
       root.addEventListener('click', function(e){
