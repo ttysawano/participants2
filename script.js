@@ -213,7 +213,6 @@
       comma: dict.export_comma || 'Comma',
       newline: dict.export_newline || 'Newline',
       run: dict.export_run || 'Export & Copy',
-      copy: dict.export_copy || 'Copy',
       output: dict.export_output || 'Output',
       copied: dict.export_copied || 'Copied!'
     };
@@ -237,21 +236,18 @@
           '</div>' +
           '<div class="pp2-export-row">' +
             '<label>'+escapeHtml(L.nameMode)+'</label>' +
-            '<label><input type="radio" name="pp2-name-mode" value="full" checked> '+escapeHtml(L.full)+'</label>' +
-            '<label><input type="radio" name="pp2-name-mode" value="first"> '+escapeHtml(L.first)+'</label>' +
+            '<label><input type="radio" name="pp2-name-mode" value="first" checked> '+escapeHtml(L.first)+'</label>' +
+            '<label><input type="radio" name="pp2-name-mode" value="full"> '+escapeHtml(L.full)+'</label>' +
           '</div>' +
           '<div class="pp2-export-row">' +
             '<label>'+escapeHtml(L.delim)+'</label>' +
-            '<label><input type="radio" name="pp2-delim" value="space" checked> '+escapeHtml(L.space)+'</label>' +
-            '<label><input type="radio" name="pp2-delim" value="comma"> '+escapeHtml(L.comma)+'</label>' +
+            '<label><input type="radio" name="pp2-delim" value="comma" checked> '+escapeHtml(L.comma)+'</label>' +
+            '<label><input type="radio" name="pp2-delim" value="space"> '+escapeHtml(L.space)+'</label>' +
             '<label><input type="radio" name="pp2-delim" value="newline"> '+escapeHtml(L.newline)+'</label>' +
           '</div>' +
           '<div class="pp2-export-row">' +
             '<label>'+escapeHtml(L.output)+'</label>' +
             '<textarea class="pp2-ex-out" readonly></textarea>' +
-            '<div class="pp2-export-actions">' +
-              '<button type="button" class="pp2-btn pp2-ex-copy">'+escapeHtml(L.copy)+'</button>' +
-            '</div>' +
           '</div>' +
         '</div>' +
         '<div class="pp2-export-foot">' +
@@ -271,8 +267,8 @@
       var wantAbsent = ov.querySelector('.pp2-ex-absent').checked;
       var modeEl = ov.querySelector('input[name="pp2-name-mode"]:checked');
       var delimEl = ov.querySelector('input[name="pp2-delim"]:checked');
-      var mode = modeEl ? modeEl.value : 'full';
-      var delim = delimEl ? delimEl.value : 'space';
+      var mode = modeEl ? modeEl.value : 'first';
+      var delim = delimEl ? delimEl.value : 'comma';
       var names = collectNames(root, wantPresent, wantAbsent).map(function(n){
         var name = (n || '').trim();
         return mode === 'first' ? firstToken(name) : name;
@@ -284,11 +280,6 @@
       var out = buildOutput();
       ov.querySelector('.pp2-ex-out').value = out;
       copyToClipboard(out, L.copied);
-    });
-
-    ov.querySelector('.pp2-ex-copy').addEventListener('click', function(){
-      var text = ov.querySelector('.pp2-ex-out').value;
-      copyToClipboard(text, L.copied);
     });
   }
 

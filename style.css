@@ -113,7 +113,6 @@
 .pp2-export-row { margin: 10px 0; }
 .pp2-export-row > label { display: inline-block; margin-right: 10px; }
 .pp2-ex-out { width: 100%; min-height: 120px; }
-.pp2-export-actions { margin-top: 6px; }
 .pp2-export-foot { text-align: right; margin-top: 10px; }
 
 /* Export toast */
