@@ -97,8 +97,8 @@
 .participants2-dialog .actions { text-align: right; margin-top: 12px; }
 .participants2-dialog .actions button { margin-left: 6px; }
 
-/* Export button */
-.participants2-export { margin-top: 10px; }
+/* Export / interval buttons */
+.participants2-export { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .pp2-btn { padding: 4px 10px; border: 1px solid #bbb; background: #f7f7f7; border-radius: 4px; cursor: pointer; }
 .pp2-btn:hover { background: #efefef; }
 .pp2-btn--primary { background: #2e6cff; color: #fff; border-color: #2e6cff; }
@@ -114,6 +114,16 @@
 .pp2-export-row > label { display: inline-block; margin-right: 10px; }
 .pp2-ex-out { width: 100%; min-height: 120px; }
 .pp2-export-foot { text-align: right; margin-top: 10px; }
+
+/* Interval modal */
+.pp2-interval-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; z-index: 9999; }
+.pp2-interval-dialog { background: #fff; padding: 16px; border-radius: 8px; width: 420px; max-width: 92vw; box-shadow: 0 4px 24px rgba(0,0,0,.2); }
+.pp2-interval-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.pp2-interval-title { font-weight: bold; }
+.pp2-interval-close { border: none; background: transparent; font-size: 18px; cursor: pointer; }
+.pp2-interval-row { margin: 10px 0; }
+.pp2-interval-row > label { display: inline-block; margin-right: 10px; }
+.pp2-interval-actions { text-align: right; margin-top: 8px; }
 
 /* Export toast */
 .pp2-toast { position: fixed; left: 50%; bottom: 20px; transform: translateX(-50%); background: #111; color: #fff; padding: 6px 10px; border-radius: 6px; opacity: 0; transition: opacity .15s ease; z-index: 10000; font-size: 12px; }

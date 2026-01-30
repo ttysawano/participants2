@@ -59,6 +59,7 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
         $absentLabel  = $this->getLang('absent_label')  ?: 'absent';
         $commentHeading = $this->getLang('comment_heading') ?: 'Attendance comments';
         $exportButton = $this->getLang('export_button') ?: 'Export…';
+        $updateButton = $this->getLang('update_button') ?: 'Update interval';
 
         // root
         $R->doc .= '<div class="participants2-root" data-pageid="'.hsc($ID).'" data-sectok="'.hsc(getSecurityToken()).'" data-canedit="'.($canEdit? '1':'0').'">';
@@ -80,6 +81,7 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
         // Export button
         $R->doc .= '<div class="participants2-export">';
         $R->doc .= '<button type="button" class="pp2-btn" data-pp2-export="1">'.hsc($exportButton).'</button>';
+        $R->doc .= '<button type="button" class="pp2-btn" data-pp2-interval="1">'.hsc($updateButton).'</button>';
         $R->doc .= '</div>';
 
         // Comments (only non-empty)
@@ -120,8 +122,19 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
             'export_copy' => $this->getLang('export_copy'),
             'export_copied' => $this->getLang('export_copied'),
             'export_output' => $this->getLang('export_output'),
+            'update_button' => $updateButton,
+            'update_title' => $this->getLang('update_title'),
+            'update_manual' => $this->getLang('update_manual'),
+            'update_10' => $this->getLang('update_10'),
+            'update_30' => $this->getLang('update_30'),
+            'update_60' => $this->getLang('update_60'),
+            'update_now' => $this->getLang('update_now'),
         );
-        $R->doc .= '<script type="application/x-participants2-i18n">'.hsc(json_encode($i18n, JSON_UNESCAPED_UNICODE)).'</script>';
+        $i18nJson = json_encode(
+            $i18n,
+            JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT
+        );
+        $R->doc .= '<script type="application/x-participants2-i18n" data-pp2-i18n="1" data-pageid="'.hsc($ID).'">'.$i18nJson.'</script>';
         $R->doc .= '<script src="'.DOKU_BASE.'lib/plugins/participants2/script.js"></script>';
         $R->doc .= '<link rel="stylesheet" href="'.DOKU_BASE.'lib/plugins/participants2/style.css?v=20250828" />';
 

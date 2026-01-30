@@ -11,7 +11,20 @@
   function escapeHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
   function getI18N(root){
-    try { return JSON.parse(root.querySelector('script[type="application/x-participants2-i18n"]').textContent); }
+    if(root && root.__pp2_i18n) return root.__pp2_i18n;
+    try {
+      var node = root && root.querySelector('script[type="application/x-participants2-i18n"]');
+      if(!node && root){
+        var pid = root.getAttribute('data-pageid') || '';
+        if(pid){
+          node = document.querySelector('script[type="application/x-participants2-i18n"][data-pp2-i18n="1"][data-pageid="'+pid+'"]');
+        }
+      }
+      if(!node) return {};
+      var dict = JSON.parse(node.textContent);
+      if(root) root.__pp2_i18n = dict;
+      return dict;
+    }
     catch(e){ return {}; }
   }
 
@@ -142,6 +155,73 @@
       }
     });
     box.innerHTML = '<p>'+escapeHtml(dict.comment_heading||'Attendance comments')+'</p>' + (lines.join(''));
+  }
+
+  var intervalState = new WeakMap();
+
+  function getIntervalState(root){
+    var st = intervalState.get(root);
+    if(!st){
+      st = { sec: 60, timer: null };
+      intervalState.set(root, st);
+    }
+    return st;
+  }
+
+  function applyRows(root, rows){
+    var dict = getI18N(root);
+    var presentLabel = dict.present_label || 'present';
+    var absentLabel = dict.absent_label || 'absent';
+    $all('.pp2-name', root).forEach(function(p){
+      var nm = p.getAttribute('data-name') || '';
+      var row = rows && rows[nm] ? rows[nm] : null;
+      var status = (row && row.status) ? row.status : 'absent';
+      var desc = (row && row.description != null) ? String(row.description) : '';
+      var title = (status === 'present') ? presentLabel : absentLabel;
+      p.setAttribute('data-status', status);
+      p.setAttribute('data-desc', desc);
+      p.setAttribute('data-title', title);
+      p.classList.toggle('is-present', status === 'present');
+      p.classList.toggle('is-absent', status !== 'present');
+    });
+    rebuildComments(root);
+  }
+
+  function refreshFromServer(root){
+    if(document.querySelector('.participants2-overlay')) return;
+    var page = root.getAttribute('data-pageid');
+    if(!page) return;
+    fetch(ajaxURL(), {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: {'Accept':'application/json'},
+      body: new URLSearchParams({cmd:'load', page: page})
+    }).then(function(resp){
+      return resp.json();
+    }).then(function(json){
+      if(json && json.ok && json.rows){
+        applyRows(root, json.rows);
+      }
+    }).catch(function(){});
+  }
+
+  function startInterval(root){
+    var st = getIntervalState(root);
+    if(st.timer){
+      clearInterval(st.timer);
+      st.timer = null;
+    }
+    if(st.sec > 0){
+      st.timer = setInterval(function(){
+        refreshFromServer(root);
+      }, st.sec * 1000);
+    }
+  }
+
+  function setIntervalSec(root, sec){
+    var st = getIntervalState(root);
+    st.sec = sec;
+    startInterval(root);
   }
 
   function firstToken(name){
@@ -295,6 +375,66 @@
     });
   }
 
+  function openIntervalModal(root){
+    var dict = getI18N(root);
+    var L = {
+      title: dict.update_title || 'Update interval',
+      manual: dict.update_manual || 'Manual only',
+      sec10: dict.update_10 || '10 sec',
+      sec30: dict.update_30 || '30 sec',
+      sec60: dict.update_60 || '60 sec',
+      now: dict.update_now || 'Update now'
+    };
+
+    var existing = document.querySelector('.pp2-interval-overlay');
+    if(existing) existing.remove();
+
+    var ov = document.createElement('div');
+    ov.className = 'pp2-interval-overlay';
+    ov.innerHTML =
+      '<div class="pp2-interval-dialog">' +
+        '<div class="pp2-interval-head">' +
+          '<span class="pp2-interval-title"></span>' +
+          '<button type="button" class="pp2-interval-close">×</button>' +
+        '</div>' +
+        '<div class="pp2-interval-body">' +
+          '<div class="pp2-interval-row">' +
+            '<label><input type="radio" name="pp2-interval" value="0"> '+escapeHtml(L.manual)+'</label>' +
+            '<label><input type="radio" name="pp2-interval" value="10"> '+escapeHtml(L.sec10)+'</label>' +
+            '<label><input type="radio" name="pp2-interval" value="30"> '+escapeHtml(L.sec30)+'</label>' +
+            '<label><input type="radio" name="pp2-interval" value="60"> '+escapeHtml(L.sec60)+'</label>' +
+          '</div>' +
+          '<div class="pp2-interval-actions">' +
+            '<button type="button" class="pp2-btn pp2-interval-now">'+escapeHtml(L.now)+'</button>' +
+          '</div>' +
+        '</div>' +
+      '</div>';
+
+    document.body.appendChild(ov);
+    ov.querySelector('.pp2-interval-title').textContent = L.title;
+
+    function close(){ ov.remove(); }
+    ov.addEventListener('click', function(e){ if(e.target === ov) close(); });
+    ov.querySelector('.pp2-interval-close').addEventListener('click', close);
+
+    var st = getIntervalState(root);
+    var current = String(st.sec);
+    var radio = ov.querySelector('input[name="pp2-interval"][value="'+current+'"]');
+    if(radio) radio.checked = true;
+
+    ov.addEventListener('change', function(e){
+      if(e.target && e.target.name === 'pp2-interval'){
+        var sec = parseInt(e.target.value, 10);
+        if(isNaN(sec)) sec = 0;
+        setIntervalSec(root, sec);
+      }
+    });
+
+    ov.querySelector('.pp2-interval-now').addEventListener('click', function(){
+      refreshFromServer(root);
+    });
+  }
+
   function init(){
     $all('.participants2-root').forEach(function(root){
       // Do not use data-sectok embedded in old HTML (avoid stale token)
@@ -317,6 +457,14 @@
         if(!btn) return;
         openExportModal(root);
       });
+
+      root.addEventListener('click', function(e){
+        var btn = e.target && e.target.closest('[data-pp2-interval="1"]');
+        if(!btn) return;
+        openIntervalModal(root);
+      });
+
+      startInterval(root);
     });
   }
 
