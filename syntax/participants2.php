@@ -58,6 +58,7 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
         $presentLabel = $this->getLang('present_label') ?: 'present';
         $absentLabel  = $this->getLang('absent_label')  ?: 'absent';
         $commentHeading = $this->getLang('comment_heading') ?: 'Attendance comments';
+        $exportButton = $this->getLang('export_button') ?: 'Export…';
 
         // root
         $R->doc .= '<div class="participants2-root" data-pageid="'.hsc($ID).'" data-sectok="'.hsc(getSecurityToken()).'" data-canedit="'.($canEdit? '1':'0').'">';
@@ -75,6 +76,11 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
             $R->doc .= '<div class="pp2-name '.$cls.'" data-name="'.hsc($nm).'" data-status="'.hsc($st).'" data-desc="'.hsc($desc).'" data-title="'.hsc($label).'">'.hsc($nm).'</div>';
         }
         $R->doc .= '</div>'; // list
+
+        // Export button
+        $R->doc .= '<div class="participants2-export">';
+        $R->doc .= '<button type="button" class="pp2-btn" data-pp2-export="1">'.hsc($exportButton).'</button>';
+        $R->doc .= '</div>';
 
         // Comments (only non-empty)
         $R->doc .= '<div class="participants2-comments"><p>'.hsc($commentHeading).'</p>';
@@ -98,6 +104,22 @@ class syntax_plugin_participants2_participants2 extends DokuWiki_Syntax_Plugin {
             'absent_label'  => $absentLabel,
             'comment_heading' => $commentHeading,
             'no_permission' => $this->getLang('no_permission'),
+            'export_button' => $exportButton,
+            'export_title' => $this->getLang('export_title'),
+            'export_range' => $this->getLang('export_range'),
+            'export_present' => $this->getLang('export_present'),
+            'export_absent' => $this->getLang('export_absent'),
+            'export_name_mode' => $this->getLang('export_name_mode'),
+            'export_full' => $this->getLang('export_full'),
+            'export_first' => $this->getLang('export_first'),
+            'export_delim' => $this->getLang('export_delim'),
+            'export_space' => $this->getLang('export_space'),
+            'export_comma' => $this->getLang('export_comma'),
+            'export_newline' => $this->getLang('export_newline'),
+            'export_run' => $this->getLang('export_run'),
+            'export_copy' => $this->getLang('export_copy'),
+            'export_copied' => $this->getLang('export_copied'),
+            'export_output' => $this->getLang('export_output'),
         );
         $R->doc .= '<script type="application/x-participants2-i18n">'.hsc(json_encode($i18n, JSON_UNESCAPED_UNICODE)).'</script>';
         $R->doc .= '<script src="'.DOKU_BASE.'lib/plugins/participants2/script.js"></script>';

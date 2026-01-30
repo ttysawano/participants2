@@ -144,6 +144,154 @@
     box.innerHTML = '<p>'+escapeHtml(dict.comment_heading||'Attendance comments')+'</p>' + (lines.join(''));
   }
 
+  function firstToken(name){
+    var s = (name || '').trim();
+    if(!s) return '';
+    var parts = s.split(/[\u0020\u3000]+/);
+    return parts[0] || s;
+  }
+
+  function collectNames(root, wantPresent, wantAbsent){
+    var out = [];
+    $all('.pp2-name', root).forEach(function(p){
+      var st = p.getAttribute('data-status') || 'absent';
+      if((st === 'present' && wantPresent) || (st === 'absent' && wantAbsent)){
+        out.push(p.getAttribute('data-name') || '');
+      }
+    });
+    return out;
+  }
+
+  function formatList(arr, delim){
+    var sep = (delim === 'space') ? ' ' : (delim === 'comma' ? ', ' : '\n');
+    return arr.join(sep);
+  }
+
+  function toast(msg){
+    var t = document.createElement('div');
+    t.className = 'pp2-toast';
+    t.textContent = msg || 'Copied!';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.classList.add('on'); }, 10);
+    setTimeout(function(){ t.classList.remove('on'); t.remove(); }, 1500);
+  }
+
+  function copyToClipboard(text, copiedMsg){
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).then(function(){
+        toast(copiedMsg || 'Copied!');
+      }).catch(function(){
+        fallbackCopy(text, copiedMsg);
+      });
+    }else{
+      fallbackCopy(text, copiedMsg);
+    }
+  }
+
+  function fallbackCopy(text, copiedMsg){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    ta.remove();
+    toast(copiedMsg || 'Copied!');
+  }
+
+  function openExportModal(root){
+    var dict = getI18N(root);
+    var L = {
+      title: dict.export_title || 'Export options',
+      range: dict.export_range || 'Range',
+      present: dict.export_present || 'Present',
+      absent: dict.export_absent || 'Absent',
+      nameMode: dict.export_name_mode || 'Name mode',
+      full: dict.export_full || 'Full name',
+      first: dict.export_first || 'First token',
+      delim: dict.export_delim || 'Delimiter',
+      space: dict.export_space || 'Space',
+      comma: dict.export_comma || 'Comma',
+      newline: dict.export_newline || 'Newline',
+      run: dict.export_run || 'Export & Copy',
+      copy: dict.export_copy || 'Copy',
+      output: dict.export_output || 'Output',
+      copied: dict.export_copied || 'Copied!'
+    };
+
+    var existing = document.querySelector('.pp2-export-overlay');
+    if(existing) existing.remove();
+
+    var ov = document.createElement('div');
+    ov.className = 'pp2-export-overlay';
+    ov.innerHTML =
+      '<div class="pp2-export-dialog">' +
+        '<div class="pp2-export-head">' +
+          '<span class="pp2-export-title"></span>' +
+          '<button type="button" class="pp2-export-close">×</button>' +
+        '</div>' +
+        '<div class="pp2-export-body">' +
+          '<div class="pp2-export-row">' +
+            '<label>'+escapeHtml(L.range)+'</label>' +
+            '<label><input type="checkbox" class="pp2-ex-present" checked> '+escapeHtml(L.present)+'</label>' +
+            '<label><input type="checkbox" class="pp2-ex-absent"> '+escapeHtml(L.absent)+'</label>' +
+          '</div>' +
+          '<div class="pp2-export-row">' +
+            '<label>'+escapeHtml(L.nameMode)+'</label>' +
+            '<label><input type="radio" name="pp2-name-mode" value="full" checked> '+escapeHtml(L.full)+'</label>' +
+            '<label><input type="radio" name="pp2-name-mode" value="first"> '+escapeHtml(L.first)+'</label>' +
+          '</div>' +
+          '<div class="pp2-export-row">' +
+            '<label>'+escapeHtml(L.delim)+'</label>' +
+            '<label><input type="radio" name="pp2-delim" value="space" checked> '+escapeHtml(L.space)+'</label>' +
+            '<label><input type="radio" name="pp2-delim" value="comma"> '+escapeHtml(L.comma)+'</label>' +
+            '<label><input type="radio" name="pp2-delim" value="newline"> '+escapeHtml(L.newline)+'</label>' +
+          '</div>' +
+          '<div class="pp2-export-row">' +
+            '<label>'+escapeHtml(L.output)+'</label>' +
+            '<textarea class="pp2-ex-out" readonly></textarea>' +
+            '<div class="pp2-export-actions">' +
+              '<button type="button" class="pp2-btn pp2-ex-copy">'+escapeHtml(L.copy)+'</button>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+        '<div class="pp2-export-foot">' +
+          '<button type="button" class="pp2-btn pp2-btn--primary pp2-ex-run">'+escapeHtml(L.run)+'</button>' +
+        '</div>' +
+      '</div>';
+
+    document.body.appendChild(ov);
+    ov.querySelector('.pp2-export-title').textContent = L.title;
+
+    function close(){ ov.remove(); }
+    ov.addEventListener('click', function(e){ if(e.target === ov) close(); });
+    ov.querySelector('.pp2-export-close').addEventListener('click', close);
+
+    function buildOutput(){
+      var wantPresent = ov.querySelector('.pp2-ex-present').checked;
+      var wantAbsent = ov.querySelector('.pp2-ex-absent').checked;
+      var modeEl = ov.querySelector('input[name="pp2-name-mode"]:checked');
+      var delimEl = ov.querySelector('input[name="pp2-delim"]:checked');
+      var mode = modeEl ? modeEl.value : 'full';
+      var delim = delimEl ? delimEl.value : 'space';
+      var names = collectNames(root, wantPresent, wantAbsent).map(function(n){
+        var name = (n || '').trim();
+        return mode === 'first' ? firstToken(name) : name;
+      }).filter(Boolean);
+      return formatList(names, delim);
+    }
+
+    ov.querySelector('.pp2-ex-run').addEventListener('click', function(){
+      var out = buildOutput();
+      ov.querySelector('.pp2-ex-out').value = out;
+      copyToClipboard(out, L.copied);
+    });
+
+    ov.querySelector('.pp2-ex-copy').addEventListener('click', function(){
+      var text = ov.querySelector('.pp2-ex-out').value;
+      copyToClipboard(text, L.copied);
+    });
+  }
+
   function init(){
     $all('.participants2-root').forEach(function(root){
       // 旧HTMLに埋め込まれた data-sectok はもう使わない（陳腐化対策）
@@ -159,6 +307,12 @@
           return;
         }
         openDialog(root, pill);
+      });
+
+      root.addEventListener('click', function(e){
+        var btn = e.target && e.target.closest('[data-pp2-export="1"]');
+        if(!btn) return;
+        openExportModal(root);
       });
     });
   }
